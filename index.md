@@ -708,7 +708,7 @@ yargs.parse();
 
 **Explicación del código:**
 
-La aplicación diseñada para el ejercicio emplea el paquete `yargs` para gestionar los diferentes comandos. En primer lugar, el comando `type` que tiene como opción `--path` recibe una determinada ruta e indica si esta es un directorio o un fichero. Para ello se emplea la función `stat` cuyo callback tiene dos argumentos `(err, stats)` donde `stats` es un objeto <fs.Stats>, que incluye los métodos `isDirectory()` y `isFile()`, los cuales permiten saber si la ruta es un directorio o un fichero respectivamente. 
+La aplicación diseñada para el ejercicio emplea el paquete `yargs` para gestionar los diferentes comandos. En primer lugar, el comando `type` que tiene como opción `--path` recibe una determinada ruta e indica si esta es un directorio o un fichero. Para ello se emplea la función `stat` cuyo callback tiene dos argumentos `(err, stats)` donde `stats` es un objeto <fs.Stats>, que incluye los métodos isDirectory() y isFile(), los cuales permiten saber si la ruta es un directorio o un fichero respectivamente. 
 
 Por su parte, el comando `createDirectory` con la opción `--path` crea un nuevo directorio a partir de la ruta que se recibe desde línea de comandos. Esto se consigue empleando la función `mdkir` que crea un directorio de forma asincrónica.
 
