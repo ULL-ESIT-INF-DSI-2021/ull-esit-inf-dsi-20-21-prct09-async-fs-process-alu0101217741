@@ -59,75 +59,86 @@ if (process.argv.length !== 3) {
 
 **Traza de ejecución del programa:**
 
-1. En primer lugar, en la Call Stack se carga main, ya que cuando cargamos un script en Node.js ese script se envuelve en una función main.
+1.En primer lugar, en la Call Stack se carga main, ya que cuando cargamos un script en Node.js ese script se envuelve en una función main.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `main()` | - | - | - |
 
-2. Se añade función asíncrona `access()` al registro de eventos del API.
+
+2.Se añade función asíncrona `access()` al registro de eventos del API.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `main()` | `access()` | - | - |
 
-3. Se acaba la ejecución de main y access pasa a la cola de manejadores.
+
+3.Se acaba la ejecución de main y access pasa a la cola de manejadores.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | - | - | `access()` | - |
 
-4. La función anónima de access pasa a la Call Stack.
+
+4.La función anónima de access pasa a la Call Stack.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `anonymousAccess()` | - | - | - |
 
-5. Si el fichero existe entonces se incluye el console.log en la Call Stack.
+
+5.Si el fichero existe entonces se incluye el console.log en la Call Stack.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `console.log(Starting to watch...)` | - | - | - |
 |  `anonymousAccess()` | - | - | - |
 
-6. Se muestra el contenido del console.log por la consola.
+
+6.Se muestra el contenido del console.log por la consola.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `anonymousAccess()` | - | - | Starting to watch... |
 
-7. Se incluye el método asíncrono watch al Node.js API.
+
+7.Se incluye el método asíncrono watch al Node.js API.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `anonymousAccess()` | `watch()`| - | Starting to watch... |
 
-8. Se añade watcher.on al Node.js API.
+
+8.Se añade watcher.on al Node.js API.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `anonymousAccess()` | `watcher.on(‘change’, () =>...)`| - | Starting to watch... |
 
-9. Se incluye el console.log en la Call Stack. 
+
+9.Se incluye el console.log en la Call Stack. 
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `console.log(‘File...watched’)` | `watcher.on(‘change’, () =>...)` | - | Starting to watch... |
 | `anonymousAccess()` | - | - | - |
 
- 10. Se muestra el contenido del console.log por la consola.
+
+10.Se muestra el contenido del console.log por la consola.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `anonymousAccess()` | `watcher.on(‘change’, () =>...)` | - | Starting to watch... |
 | - | - | - | File...watched |
 
-11. Finaliza la función anónima de access. Ahora se realiza la primera modificación del fichero helloworld.txt por lo que el callback de watcher pasa a Callback Queue.
+
+11.Finaliza la función anónima de access. Ahora se realiza la primera modificación del fichero helloworld.txt por lo que el callback de watcher pasa a Callback Queue.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | - | `watcher.on(‘change’, () =>...)` | `() => {console.log('File ${filename} has been ...})` | Starting to watch... |
 | - | - | - | File...watched |
+
 
 12.La función anónima del callback de watcher pasa a la Call Stack.
 
@@ -136,14 +147,16 @@ if (process.argv.length !== 3) {
 | `anonymousWatcher()` | `watcher.on(‘change’, () =>...)` | - | Starting to watch... |
 | - | - | - | File...watched |
 
-13. Se incluye el console.log en la Call Stack. 
+
+13.Se incluye el console.log en la Call Stack. 
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | `console.log(‘File...somehow’)` | `watcher.on(‘change’, () =>...)` | - | Starting to watch... |
 | `anonymousWatcher()` | - | - | File...watched |
 
-14. Se muestra el contenido del console.log por la consola.
+
+14.Se muestra el contenido del console.log por la consola.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
@@ -151,13 +164,15 @@ if (process.argv.length !== 3) {
 | - | - | - | File...watched |
 | - | - | - | File...somehow |
 
-15. Finaliza la función anónima del watcher, y se produce la segunda modificación del fichero helloworld.txt.
+
+15.Finaliza la función anónima del watcher, y se produce la segunda modificación del fichero helloworld.txt.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
 | - | `watcher.on(‘change’, () =>...)` | `() => {console.log('File ${filename} has been ...})` | Starting to watch... |
 | - | - | - | File...watched |
 | - | - | - | File...somehow |
+
 
 16.La función anónima del callback de watcher pasa a la Call Stack.
 
@@ -167,7 +182,8 @@ if (process.argv.length !== 3) {
 | - | - | - | File...watched |
 | - | - | - | File...somehow |
 
-17. Se incluye el console.log en la Call Stack. 
+
+17.Se incluye el console.log en la Call Stack. 
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
@@ -175,7 +191,8 @@ if (process.argv.length !== 3) {
 | `anonymousWatcher()` | - | - | File...watched |
 | - | - | - | File...somehow |
 
-18. Se muestra el contenido del console.log por la consola.
+
+18.Se muestra el contenido del console.log por la consola.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
@@ -184,7 +201,8 @@ if (process.argv.length !== 3) {
 | - | - | - | File...somehow |
 | - | - | - | File...somehow |
 
-19. Finaliza la función anónima del watcher, y este proceso se repetirá mientras el usuario continue realizando cambios sobre el fichero. El programa finaliza completamente cuando se pulsa `ctrl + C`.
+
+19.Finaliza la función anónima del watcher, y este proceso se repetirá mientras el usuario continue realizando cambios sobre el fichero. El programa finaliza completamente cuando se pulsa `ctrl + C`.
 
 | Call Stack | Node.js API | Callback Queue | Console |
 | -- | -- | -- | -- |
@@ -195,4 +213,11 @@ if (process.argv.length !== 3) {
 
 **Respuesta a las preguntas planteadas en el enunciado:**
 
-**¿Qué hace la función access?**
+**¿Qué hace la función `access`? ¿Para qué sirve el objeto `constants`?**
+
+La función `access` comprueba los permisos de un usuario para el archivo o directorio especificado. El objeto `constants` especifica las comprobaciones de accesibilidad que se realizarán, esta puede tener los siguientes valores:
+
+* `F_OK`:  Se utiliza para determinar si existe un archivo.
+* `R_OK`: Indica que el proceso de llamada puede leer el archivo.
+* `W_OK`: Indica que el proceso de llamada puede escribir el archivo.
+* `X_OK`:  Indica que el proceso de llamada puede ejecutar el archivo.
