@@ -505,12 +505,12 @@ Lo primero que haría es que en lugar de pasar a la función la ruta `./notes/us
 
 Desarrolle una aplicación que permita hacer de **wrapper** de los distintos comandos empleados en Linux para el manejo de ficheros y directorios. En concreto, la aplicación deberá permitir:
 
-Dada una ruta concreta, mostrar si es un directorio o un fichero.
-Crear un nuevo directorio a partir de una nueva ruta que recibe como parámetro.
-Listar los ficheros dentro de un directorio.
-Mostrar el contenido de un fichero (similar a ejecutar el comando `cat`).
-Borrar ficheros y directorios.
-Mover y copiar ficheros y/o directorios de una ruta a otra. Para este caso, la aplicación recibirá una ruta origen y una ruta destino. En caso de que la ruta origen represente un directorio, se debe copiar dicho directorio y todo su contenido a la ruta destino.
+1. Dada una ruta concreta, mostrar si es un directorio o un fichero.
+2. Crear un nuevo directorio a partir de una nueva ruta que recibe como parámetro.
+3. Listar los ficheros dentro de un directorio.
+4. Mostrar el contenido de un fichero (similar a ejecutar el comando `cat`).
+5. Borrar ficheros y directorios.
+6. Mover y copiar ficheros y/o directorios de una ruta a otra. Para este caso, la aplicación recibirá una ruta origen y una ruta destino. En caso de que la ruta origen represente un directorio, se debe copiar dicho directorio y todo su contenido a la ruta destino.
 
 Para interactuar con la aplicación a través de la línea de comandos, puede hacer uso de `yargs`.
 
@@ -730,3 +730,9 @@ Además, he entendido cómo utilizar el API asíncrona que ofrece Node.js para c
 
 Por tanto, pienso que esta práctica ha sido muy interesante porque a pesar de que ya había tenido que acceder al sistema de ficheros para trabajar con ellos, esto siempre lo hacía siguiendo un modelo síncrono, sin embargo, ahora sé como realizar lo mismo de manera asíncrona.
 
+## 6. Bibliografía
+
+* [Documentación del API de callbacks de Node.js](https://nodejs.org/dist/latest/docs/api/fs.html#fs_callback_api)
+* [Documentación del API asíncrona de Node.js](https://nodejs.org/dist/latest/docs/api/child_process.html#child_process_asynchronous_process_creation)
+* [Documentación de Stream](https://nodejs.org/api/stream.html)
+* [Documentación del paquete yargs](https://www.npmjs.com/package/yargs)
