@@ -384,3 +384,117 @@ La función `analyzeFileWithoutPipe`es similar a lo explicado anteriormente, con
 
 Para que sea posible pasar a la aplicación la ruta del fichero e indicar si queremos visualizar el número de líneas, palabras, caracteres o combinaciones de ellas, se emplea el paquete `yargs`. De esta forma se gestiona el comando `analyzeFile` que tiene las opciones `--path`, `--lines`, `--words`, `--characters` y `--pipe`. Si **pipe** es `true` se invoca a la función `analyzeFileWithPipe`, en otro caso se utiliza la función `analyzeFileWithoutPipe`. Finalmente, se incluye la sentencia `yargs.parse()` para poder procesar los argumentos pasados desde la línea de comandos a la aplicación.
 
+### 4.3. Ejercicio 3
+
+**Enunciado:**
+
+A partir de la aplicación de procesamiento de notas desarrollada en la Práctica 8, desarrolle una aplicación que reciba desde la línea de comandos el nombre de un usuario de la aplicación de notas, así como la ruta donde se almacenan las notas de dicho usuario. Puede gestionar el paso de parámetros desde la línea de comandos haciendo uso de `yargs`. La aplicación a desarrollar deberá controlar los cambios realizados sobre todo el directorio especificado al mismo tiempo que dicho usuario interactúa con la aplicación de procesamiento de notas. Nótese que no hace falta modificar absolutamente nada en la aplicación de procesamiento de notas. Es una aplicación que se va a utilizar para provocar cambios en el sistema de ficheros.
+
+Para ello, utilice la función `watch` y no la función `watchFile`, dado que esta última es más ineficiente que la primera. La función `watch` devuelve un objeto `Watcher`, que también es un objeto `EventEmitter`. ¿Qué evento emite el objeto `Watcher` cuando se crea un nuevo fichero en el directorio observado? ¿Y cuando se elimina un fichero existente? ¿Y cuando se modifica?
+
+Con cada cambio detectado en el directorio observado, el programa deberá indicar si se ha añadido, modificado o borrado una nota, además de indicar el nombre concreto del fichero creado, modificado o eliminado para alojar dicha nota.
+
+Programe defensivamente, es decir, trate de controlar los potenciales errores que podrían surgir a la hora de ejecutar su aplicación.
+
+Por último, trate de contestar a las siguientes preguntas:
+
+* ¿Cómo haría para mostrar, no solo el nombre, sino también el contenido del fichero, en el caso de que haya sido creado o modificado?
+* ¿Cómo haría para que no solo se observase el directorio de un único usuario sino todos los directorios correspondientes a los diferentes usuarios de la aplicación de notas?
+
+**Código:**
+
+```ts
+import * as yargs from 'yargs';
+import * as fs from 'fs';
+
+/**
+ * Method that controls the changes made to the entire directory whose path is passed as a parameter.
+ * @param directory The path where the directory to be controlled is located.
+ */
+function watchDirectory(directory: string) {
+  let fsWait = false;
+  fs.readdir(directory, (err, filesBefore) => {
+    if (err) {
+      console.log('Something went wrong when reading your directory\n');
+    } else {
+      fs.watch(directory, (eventType, filename) => {
+        if (filename) {
+          if (fsWait) return;
+          fsWait = true;
+          fs.readdir(directory, (err, filesAfter) => {
+            if (err) {
+              console.log('Something went wrong when reading your directory\n');
+            } else {
+              if (eventType === 'rename' && filesBefore.length < filesAfter.length) {
+                console.log(`File ${filename} has been added\n`);
+              } else if (eventType === 'rename') {
+                console.log(`File ${filename} has been deleted\n`);
+              } else if (eventType === 'change') {
+                console.log(`File ${filename} has been modified\n`);
+              }
+            }
+            filesBefore = filesAfter;
+          });
+          setTimeout(() => {
+            fsWait = false;
+          }, 100);
+        } else {
+          console.log('filename not provided\n');
+        }
+      });
+    }
+  });
+  console.log(`Waiting for changes in directory ${directory} ...\n`);
+}
+
+/**
+ * Command that allows you to control the changes made to the directory of a specific user of
+ * the notes application. The user is specified in the --user option.
+ */
+yargs.command({
+  command: 'watch',
+  describe: 'Controls changes made to the directory containing user notes',
+  builder: {
+    user: {
+      describe: 'User whose directory is to be controlled',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if (typeof argv.user === 'string') {
+      watchDirectory('./notes/' + argv.user);
+    }
+  },
+});
+
+/**
+ * Process the arguments passed from the command line to the application.
+ */
+yargs.parse();
+```
+
+**Explicación del código:**
+
+La función `watchDirectory` recibe como parámetro la ruta del directorio cuyos cambios se deben controlar. La función `watch`, que debemos emplear para solucionar este ejercicio, controla los cambios en un archivo o directorio, sin embargo, puede generar múltiples eventos cuando se lleva a cabo un sólo cambio como puede ser añadir, eliminar o modificar un fichero. Para evitar estos múltiples eventos e imprimir en consola una sola vez el cambio que se ha realizado, se crea la variable **fsWait** que va a servir cuando este a `true` para no capturar cambios superfluos dentro de una ventana de tiempo determinada. Tras crear esta variable, se utiliza la función `readdir` para leer el contenido del directorio que se encuentra en **directory**, el callback tiene dos argumetos `(err, filesBefore)` donde **filesBefore** almacena los nombres de los archivos en el directorio excluyendo `.` and `..`. De esta forma se puede saber el contenido inicial del directorio. Si se produce algún error leyendo el directorio se muestra en pantalla `Something went wrong when reading your directory`. En otro caso, se utiliza `watch` cuyo callback tiene dos argumentos `(eventType, filename)`, donde `eventType` es `rename` o `change`, y `filename` es el nombre del archivo que desencadenó el evento. Ahora si tenemos el nombre del fichero, si la variable **fsWait** es `true` significa como explique al principio que no debemos capturar ese evento, debido a que anteriormente ya hemos recibido uno que nos ha indicado si se ha añadido, eliminado o modificado un fichero. Si **fsWait** es falsa se pone a `true` y se vuelve a emplear el método `readdir` esto va a permitir que en **filesAfter** se almacenen los ficheros que están en el directorio tras el cambio realizado. Con esta información y el tipo de evento que se incluye en **eventType** podemos diferenciar qué cambio se ha hecho de la siguiente manera:
+*  Si el evento es de tipo `rename` y el número de ficheros en el directorio ha aumentado, esto lo podemos saber ya que el tamaño del array de string **filesBefore** es menor que **filesAfter**, entonces se ha añadido un fichero al directorio.
+* Si el evento es de tipo `rename` y no ha aumentado el número de ficheros en el directorio entonces se ha eliminado un fichero.
+* Por último, si el evento es de tipo `change` significa que se ha modificado uno de los ficheros.
+
+Tras estos if-else la variable **filesBefore** toma el valor de **filesAfter** para hacer que esta variable tenga actualizada la cantidad de ficheros que hay en el directorio. Una vez hecho esto,  se utiliza la función `setTimeout` donde tras 100 milisegundos se establece que **fsWait** es `false`, esto lo hago como ya expliqué para emitir sólo un evento de cambio de archivo para un cambio de archivo dado.
+
+En caso de que no se obtenga el nombre del fichero que provocó el evento se muestra en pantalla `filename not provided`.
+
+La última línea de código de `watchDirectory` se emplea para mostrar por consola `Waiting for changes in directory ${directory} ...`, aunque es la línea final de la función como estamos trabajando de forma asíncrona será la primera que se muestre.
+
+Para hacer que la aplicación reciba desde la línea de comandos el nombre del usuario de la aplicación de notas cuyo directorio se va a controlar, se emplea el paquete `yargs`. De forma que se gestiona el comando `watch` con la opción `--user`. Por último, al igual que en el ejercicio anterior se incluye la línea `yargs.parse()` para poder procesar los argumentos pasados desde la línea de comandos.
+
+**Respuesta a las preguntas planteadas en el enunciado:**
+
+**¿Cómo haría para mostrar, no solo el nombre, sino también el contenido del fichero, en el caso de que haya sido creado o modificado?**
+
+Cuando el fichero se cree o se modifique utilizaría la función asíncrona `readFile` que lee todo el contenido de un fichero, y este contenido lo mostraría por consola.
+
+**¿Cómo haría para que no solo se observase el directorio de un único usuario sino todos los directorios correspondientes a los diferentes usuarios de la aplicación de notas?**
+
+Lo primero que haría es que en lugar de pasar a la función la ruta `./notes/username` le pasaría `./notes`, es decir, el directorio que contiene las notas de todos los usuarios. Además, incluiría `{recursive: true}` como argumento de la función `watch` para indicar que se deben vigilar todos los subdirectorios y no sólo el directorio actual. 
