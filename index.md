@@ -721,3 +721,12 @@ El comando `remove` con la opción `--path` permite borrar ficheros y directorio
 Por último, con el comando `copy` y las opciones `--sourcePath` y `--destinationPath` es posible copiar ficheros y/o directorios de una ruta a otra. Primero se utiliza la función `access` para comprobar que en la ruta de origen es posible leer. Si esto es correcto también se verifica con `access` que se puede escribir en la ruta de destino. En caso de que esto sea posible se crea  un proceso para ejecutar el comando `cp` con la opción `-r` y las dos rutas. Cuando se emita el evento `close` significa que ha terminado la copia por lo que se muestra en pantalla `${argv.sourcePath} was copied to ${argv.destinationPath}`.
 
 Al igual que en los ejercicios anteriores se incluye la línea `yargs.parse()` para poder procesar los argumentos pasados desde la línea de comandos.
+
+## 5. Conclusiones
+
+En conclusión, con esta práctica me he familiarizado con el API de callbacks proporcionada por Node.js para interactuar con el sistema de ficheros. Con esto he aprendido a trabajar de forma asíncrona con los ficheros realizando todas las operaciones sin bloquear el bucle de eventos, y luego invocando una función callback cuando se completa o se produce un error.
+
+Además, he entendido cómo utilizar el API asíncrona que ofrece Node.js para crear procesos, lo que me ha permitido ejecutar determinados comandos que eran necesarios para resolver algunos de los ejercicios propuestos.
+
+Por tanto, pienso que esta práctica ha sido muy interesante porque a pesar de que ya había tenido que acceder al sistema de ficheros para trabajar con ellos, esto siempre lo hacía siguiendo un modelo síncrono, sin embargo, ahora sé como realizar lo mismo de manera asíncrona.
+
